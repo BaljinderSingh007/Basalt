@@ -59,11 +59,24 @@ public class ImageController {
                 .generateImage(request.getPrompt(), request.getWidth(), request.getHeight())
                 .map(imageUrl -> ResponseEntity.ok(Map.of("imageUrl", imageUrl)))
                 .onErrorResume(ex -> {
-                    log.error("Image generation failed: {}", ex.getMessage());
+                    String errorMsg = ex.getMessage();
+                    log.error("Image generation failed: {}", errorMsg);
+                    
+                    // Provide helpful error messages based on error type
+                    String userMessage;
+                    if (errorMsg.contains("429") || errorMsg.contains("Too Many Requests")) {
+                        userMessage = "AI Horde is currently rate-limiting requests. Please try again in a few minutes.";
+                    } else if (errorMsg.contains("403") || errorMsg.contains("FORBIDDEN")) {
+                        userMessage = "AI Horde requires kudos for this request. Try smaller dimensions (max 512x512) or wait a few minutes.";
+                    } else if (errorMsg.contains("530") || errorMsg.contains("503")) {
+                        userMessage = "Image generation service is temporarily unavailable. Please try again later.";
+                    } else {
+                        userMessage = "Image generation failed: " + errorMsg;
+                    }
+                    
                     return Mono.just(ResponseEntity
                             .status(HttpStatus.BAD_GATEWAY)
-                            .body(Map.of("error",
-                                    "Image generation failed: " + ex.getMessage())));
+                            .body(Map.of("error", userMessage)));
                 });
     }
 }
