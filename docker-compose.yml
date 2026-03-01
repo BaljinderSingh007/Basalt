@@ -1,0 +1,52 @@
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Basalt — Docker Compose Stack
+# Services: PostgreSQL + pgvector, Ollama (optional GPU passthrough)
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+
+  # ── PostgreSQL 16 with pgvector extension ──────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: basalt-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: basalt_db
+      POSTGRES_USER: basalt
+      POSTGRES_PASSWORD: basalt
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-pgvector.sql:/docker-entrypoint-initdb.d/init-pgvector.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U basalt -d basalt_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ── Ollama — Local LLM Engine ───────────────────────────────────────────────
+  # Comment the `deploy` section if you do not have an NVIDIA GPU.
+  # Models are persisted in the ollama_data volume.
+  ollama:
+    image: ollama/ollama:latest
+    container_name: basalt-ollama
+    restart: unless-stopped
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    # ── NVIDIA GPU passthrough (uncomment if you have an NVIDIA GPU) ──────────
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+volumes:
+  postgres_data:
+  ollama_data:
+

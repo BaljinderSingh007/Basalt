@@ -1,0 +1,69 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Basalt AI Assistant — Spring Boot Application Configuration
+# ─────────────────────────────────────────────────────────────────────────────
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+spring:
+  application:
+    name: basalt-backend
+
+  # Increase async timeout for long-running image generation (AI Horde ~10-60s)
+  mvc:
+    async:
+      request-timeout: 180000   # 3 minutes in ms
+
+  # ── PostgreSQL DataSource ────────────────────────────────────────────────
+  datasource:
+    url: jdbc:postgresql://localhost:5433/basalt_db
+    username: basalt
+    password: basalt
+    driver-class-name: org.postgresql.Driver
+
+  # ── JPA / Hibernate ──────────────────────────────────────────────────────
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+
+  # ── Spring AI — Ollama ───────────────────────────────────────────────────
+  ai:
+    ollama:
+      base-url: http://localhost:11434
+      chat:
+        model: llama3.2:1b      # lightweight model — fits in limited Docker memory
+        options:
+          temperature: 0.7
+          top-p: 0.9
+          num-predict: 2048
+      embedding:
+        model: nomic-embed-text  # lightweight, purpose-built embedding model
+
+    # ── PgVector Store ─────────────────────────────────────────────────────
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 768           # matches nomic-embed-text output dims
+        initialize-schema: true   # auto-create the vector table on startup
+
+# ── Actuator ─────────────────────────────────────────────────────────────────
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+# ── Logging ───────────────────────────────────────────────────────────────────
+logging:
+  level:
+    com.basalt: DEBUG
+    org.springframework.ai: INFO
+

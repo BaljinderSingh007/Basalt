@@ -1,0 +1,29 @@
+# ── IDE ──────────────────────────────────────────
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# ── Java / Maven ─────────────────────────────────
+basalt-backend/target/
+*.class
+*.jar
+*.war
+*.log
+hs_err_pid*
+
+# ── Node / Angular ───────────────────────────────
+basalt-frontend/node_modules/
+basalt-frontend/dist/
+basalt-frontend/.angular/
+basalt-frontend/.sass-cache/
+
+# ── OS ───────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── Environment / Secrets ────────────────────────
+.env
+*.env.local

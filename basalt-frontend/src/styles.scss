@@ -1,0 +1,78 @@
+/* ── Tailwind base layers ───────────────────────────────────── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Highlight.js theme (One Dark — matches Basalt palette) ─── */
+@import 'highlight.js/styles/atom-one-dark.css';
+
+/* ── Global base resets ─────────────────────────────────────── */
+@layer base {
+  html, body {
+    @apply h-full overflow-hidden;
+    background-color: #0f0f11;
+    color: #e8eaed;
+  }
+
+  /* Custom scrollbar — minimal, dark */
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-basalt-border rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-basalt-muted;
+  }
+}
+
+/* ── Markdown / ngx-markdown overrides ─────────────────────── */
+@layer components {
+  .prose.prose-basalt {
+    /* Code blocks */
+    pre {
+      @apply bg-basalt-surface2 rounded-xl overflow-x-auto my-3 p-4 text-xs;
+      border: 1px solid theme('colors.basalt.border');
+    }
+
+    /* Inline code */
+    :not(pre) > code {
+      @apply bg-basalt-surface2 text-basalt-accent rounded px-1.5 py-0.5 text-xs font-mono;
+    }
+
+    /* Blockquotes */
+    blockquote {
+      @apply border-l-4 border-basalt-accent pl-4 text-basalt-muted italic;
+    }
+
+    /* Tables */
+    table {
+      @apply w-full text-sm my-3;
+    }
+    th {
+      @apply bg-basalt-surface2 text-basalt-accent font-semibold px-3 py-2 text-left;
+    }
+    td {
+      @apply border-t border-basalt-border px-3 py-2;
+    }
+
+    /* Links */
+    a {
+      @apply text-basalt-accent hover:text-basalt-accentHov underline underline-offset-2;
+    }
+
+    /* Headings */
+    h1, h2, h3, h4 {
+      @apply text-basalt-text font-semibold mt-4 mb-2;
+    }
+
+    /* Horizontal rule */
+    hr {
+      @apply border-basalt-border my-4;
+    }
+  }
+}
+
